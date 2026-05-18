@@ -1,4 +1,4 @@
-// index.js – Proxy para Discord OAuth (Cloudflare Worker)
+// index.js – Discord OAuth Proxy for Cloudflare Worker
 export default {
   async fetch(request, env, ctx) {
     const DISCORD_API_BASE = 'https://discord.com/api';
@@ -8,7 +8,7 @@ export default {
       'Access-Control-Allow-Headers': '*'
     };
 
-    // CORS preflight
+    // Preflight CORS
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -16,19 +16,15 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // Página de status (JSON)
+    // Rota de status (JSON)
     if (path === '/' || path === '/status') {
       return new Response(
-        JSON.stringify(
-          {
-            success: true,
-            message: 'Discord OAuth Proxy Online',
-            version: '1.0.0',
-            endpoints: ['POST /token', 'GET /users/@me']
-          },
-          null,
-          2
-        ),
+        JSON.stringify({
+          success: true,
+          message: 'Discord OAuth Proxy Online',
+          version: '1.0.0',
+          endpoints: ['POST /token', 'GET /users/@me']
+        }),
         {
           status: 200,
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -38,9 +34,11 @@ export default {
 
     // Roteamento
     let targetPath = '';
-    if (path === '/token') targetPath = '/oauth2/token';
-    else if (path === '/users/@me') targetPath = '/users/@me';
-    else {
+    if (path === '/token') {
+      targetPath = '/oauth2/token';
+    } else if (path === '/users/@me') {
+      targetPath = '/users/@me';
+    } else {
       return new Response(
         JSON.stringify({ success: false, error: 'Route not found' }),
         { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -49,7 +47,7 @@ export default {
 
     const targetUrl = `${DISCORD_API_BASE}${targetPath}`;
 
-    // Headers – remove os problemáticos
+    // Copiar headers, removendo os problemáticos
     const headers = new Headers();
     for (const [key, value] of request.headers.entries()) {
       const lower = key.toLowerCase();
@@ -75,7 +73,6 @@ export default {
     }
 
     const response = await fetch(targetUrl, fetchConfig);
-
     const responseHeaders = new Headers(response.headers);
     responseHeaders.set('Access-Control-Allow-Origin', '*');
     responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
