@@ -1,0 +1,19 @@
+{
+"name": "discord-oauth-proxy",
+"version": "1.0.0",
+"description": "Discord OAuth2 Proxy using Cloudflare Workers",
+"main": "index.js",
+"type": "module",
+"scripts": {
+"start": "node index.js"
+},
+"keywords": [
+"discord",
+"oauth2",
+"proxy",
+"cloudflare",
+"workers",
+"cors"
+],
+"license": "MIT"
+}
