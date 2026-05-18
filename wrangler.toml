@@ -1,0 +1,8 @@
+name = "discord-oauth-proxy"
+main = "index.js"
+compatibility_date = "2026-05-18"
+
+workers_dev = true
+
+[observability.logs]
+enabled = true
